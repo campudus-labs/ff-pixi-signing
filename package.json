@@ -1,0 +1,28 @@
+{
+  "name": "pixi-signing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Narigo/pixi-signing.git"
+  },
+  "author": "Campudus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Narigo/pixi-signing/issues"
+  },
+  "homepage": "https://github.com/Narigo/pixi-signing#readme",
+  "devDependencies": {
+    "browser-sync": "^2.9.3",
+    "browserify": "^11.1.0",
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "gulp-sass": "^2.0.4",
+    "pixi.js": "^3.0.7",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
