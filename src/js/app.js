@@ -1,18 +1,48 @@
-var pixi = require('pixi.js');
+var PIXI = require('pixi.js');
+
+var resolution = (function () {
+  var w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName('body')[0],
+    x = w.innerWidth || e.clientWidth || g.clientWidth,
+    y = w.innerHeight || e.clientHeight || g.clientHeight;
+
+  return [x, y];
+}());
+
+var maxWidth = resolution[0];
+var maxHeight = resolution[1];
 
 var canvas = document.getElementById('signer');
-var width = canvas.width;
-var height = canvas.height;
+canvas.width = maxWidth;
+canvas.height = maxHeight;
 
-var renderer = new pixi.autoDetectRenderer(width, height, {view : canvas});
+var renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas});
 
 // create the root of the scene graph
 var stage = new PIXI.Container();
-stage.interactive = true;
 
 var graphics = new PIXI.Graphics();
 
-var x, y;
+var points = [];
+
+var currentX = 0;
+var currentY = 0;
+
+var deleteBtn = document.querySelector('#signature .reset');
+deleteBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  reset();
+});
+
+stage.interactive = true;
+stage.hitArea = new PIXI.Rectangle(0, 0, maxWidth, maxHeight);
+stage
+  .on('mousedown', onDown)
+  .on('touchstart', onDown);
 
 reset();
 
@@ -20,33 +50,68 @@ reset();
 animate();
 
 function drawStart(x, y) {
-  // TODO graphics.moveTo
+  points.push([true, x, y]);
+
   graphics.moveTo(x, y);
+  graphics.lineTo(x, y);
+
+  currentX = x;
+  currentY = y;
+
+  stage.addChild(graphics);
 }
 
 function drawTo(x, y) {
-  // TODO graphics.lineTo
+  points.push([false, x, y]);
+
+  graphics.moveTo(currentX, currentY);
   graphics.lineTo(x, y);
+
+  currentX = x;
+  currentY = y;
 }
 
 function reset() {
-  // TODO reset canvas / pixi
+  console.log('reset');
+  graphics.clear();
+
   graphics.beginFill(0xFF3300);
   graphics.lineStyle(4, 0xffd900, 1);
 
-  x = 100;
-  y = 100;
-  drawStart(x, y);
+  stage.addChild(graphics);
 }
 
 function animate() {
-  x = (x + 1) % 100;
-  y = (y + 1) % 100;
-
-  drawTo(x, y);
-
   stage.addChild(graphics);
   renderer.render(stage);
 
   requestAnimationFrame(animate);
+}
+
+function onDown(eventData) {
+  stage
+    .on('mouseup', onUp)
+    .on('touchend', onUp)
+    .on('mouseupoutside', onUp)
+    .on('touchendoutside', onUp)
+    .on('mousemove', onMove)
+    .on('touchmove', onMove);
+
+  drawStart(eventData.data.global.x, eventData.data.global.y);
+}
+
+function onUp(eventData) {
+  stage
+    .off('mouseup', onUp)
+    .off('touchend', onUp)
+    .off('mouseupoutside', onUp)
+    .off('touchendoutside', onUp)
+    .off('mousemove', onMove)
+    .off('touchmove', onMove);
+
+  drawTo(eventData.data.global.x, eventData.data.global.y);
+}
+
+function onMove(eventData) {
+  drawTo(eventData.data.global.x, eventData.data.global.y);
 }
