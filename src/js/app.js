@@ -50,7 +50,7 @@ reset();
 animate();
 
 function drawStart(x, y) {
-  points.push([true, x, y]);
+  points.push([x, y]);
 
   graphics.moveTo(x, y);
   graphics.lineTo(x, y);
@@ -62,7 +62,7 @@ function drawStart(x, y) {
 }
 
 function drawTo(x, y) {
-  points.push([false, x, y]);
+  points.push([x, y]);
 
   graphics.moveTo(currentX, currentY);
   graphics.lineTo(x, y);
@@ -71,11 +71,19 @@ function drawTo(x, y) {
   currentY = y;
 }
 
+function drawEnd() {
+  console.log('draw end, smoothing line');
+  graphics.lineStyle(4, 0x00d9ff, 1);
+  // smoothLine(points);
+
+  graphics.lineStyle(4, 0xffd900, 1);
+  points = [];
+}
+
 function reset() {
   console.log('reset');
   graphics.clear();
 
-  graphics.beginFill(0xFF3300);
   graphics.lineStyle(4, 0xffd900, 1);
 
   stage.addChild(graphics);
@@ -110,6 +118,7 @@ function onUp(eventData) {
     .off('touchmove', onMove);
 
   drawTo(eventData.data.global.x, eventData.data.global.y);
+  drawEnd();
 }
 
 function onMove(eventData) {
