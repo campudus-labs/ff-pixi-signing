@@ -1,4 +1,5 @@
 var PIXI = require('pixi.js');
+var smoothLine = require('./spline-interpolation').drawSmooth;
 
 var resolution = (function () {
   var w = window,
@@ -31,7 +32,7 @@ var currentX = 0;
 var currentY = 0;
 
 var deleteBtn = document.querySelector('#signature .reset');
-deleteBtn.addEventListener('click', function(e) {
+deleteBtn.addEventListener('click', function (e) {
   e.preventDefault();
   e.stopPropagation();
 
@@ -74,7 +75,7 @@ function drawTo(x, y) {
 function drawEnd() {
   console.log('draw end, smoothing line');
   graphics.lineStyle(4, 0x00d9ff, 1);
-  // smoothLine(points);
+  smoothLine(points, graphics, 0.5);
 
   graphics.lineStyle(4, 0xffd900, 1);
   points = [];
