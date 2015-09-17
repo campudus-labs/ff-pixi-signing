@@ -25,6 +25,7 @@ var renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas});
 var stage = new PIXI.Container();
 
 var graphics = new PIXI.Graphics();
+var smoothed = new PIXI.Graphics();
 
 var points = [];
 
@@ -51,7 +52,7 @@ reset();
 animate();
 
 function drawStart(x, y) {
-  points.push([x, y]);
+  points.push([x, y, new Date().getTime()]);
 
   graphics.moveTo(x, y);
   graphics.lineTo(x, y);
@@ -63,7 +64,7 @@ function drawStart(x, y) {
 }
 
 function drawTo(x, y) {
-  points.push([x, y]);
+  points.push([x, y, new Date().getTime()]);
 
   graphics.moveTo(currentX, currentY);
   graphics.lineTo(x, y);
@@ -74,20 +75,26 @@ function drawTo(x, y) {
 
 function drawEnd() {
   console.log('draw end, smoothing line');
-  graphics.lineStyle(4, 0x00d9ff, 1);
-  smoothLine(points, graphics, 0.5);
 
-  graphics.lineStyle(4, 0xffd900, 1);
+  smoothLine(points, smoothed, function() {
+    graphics.clear();
+  });
+
+  stage.addChild(smoothed);
+
   points = [];
 }
 
 function reset() {
   console.log('reset');
   graphics.clear();
+  smoothed.clear();
 
   graphics.lineStyle(4, 0xffd900, 1);
+  smoothed.lineStyle(4, 0x00d9ff, 1);
 
   stage.addChild(graphics);
+  stage.addChild(smoothed);
 }
 
 function animate() {
