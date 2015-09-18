@@ -11,13 +11,13 @@ function drawSmooth(points, graphics, end) {
     graphics.drawCircle(points[0][0], points[0][1], 2.5);
     graphics.drawCircle(points[0][0], points[0][1], 2.5);
     end();
-  } else {
+  } else if (points.length >= 3) {
     nextPoint();
   }
 
   function nextPoint() {
     pad.addPoint(points[i]);
-    if (i < points.length) {
+    if (i < points.length - 1) {
       i++;
       requestAnimationFrame(nextPoint);
     } else {
