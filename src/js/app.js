@@ -75,16 +75,18 @@ function drawTo(x, y) {
 
 function drawEnd() {
   console.log('draw end, smoothing line');
+  var graphicsToClear = graphics;
 
   smoothLine(points, smoothed, function() {
     console.log('done!');
-    graphics.clear();
-
-    graphics = new PIXI.Graphics();
-    graphics.lineStyle(4, 0xffd900, 1);
-    stage.addChild(graphics);
+    graphicsToClear.clear();
+    graphicsToClear = null;
   });
 
+  graphics = new PIXI.Graphics();
+  graphics.lineStyle(4, 0xffd900, 1);
+
+  stage.addChild(graphics);
   stage.addChild(smoothed);
 
   points = [];
