@@ -74,11 +74,9 @@ function drawTo(x, y) {
 }
 
 function drawEnd() {
-  console.log('draw end, smoothing line');
   var graphicsToClear = graphics;
 
   smoothLine(points, smoothed, function() {
-    console.log('done!');
     graphicsToClear.clear();
     graphicsToClear = null;
   });
@@ -93,7 +91,6 @@ function drawEnd() {
 }
 
 function reset() {
-  console.log('reset');
   graphics.clear();
   smoothed.clear();
 
