@@ -27,6 +27,7 @@ var stage = new PIXI.Container();
 var graphics = new PIXI.Graphics();
 var smoothed = new PIXI.Graphics();
 
+var status = {isDrawing : false};
 var points = [];
 
 var currentX = 0;
@@ -52,6 +53,7 @@ reset();
 animate();
 
 function drawStart(x, y) {
+  status.isDrawing = true;
   points.push([x, y, new Date().getTime()]);
 
   graphics.moveTo(x, y);
@@ -74,9 +76,10 @@ function drawTo(x, y) {
 }
 
 function drawEnd() {
+  status.isDrawing = false;
   var graphicsToClear = graphics;
 
-  smoothLine(points, smoothed, function() {
+  smoothLine(status, points, smoothed, function () {
     graphicsToClear.clear();
     graphicsToClear = null;
   });

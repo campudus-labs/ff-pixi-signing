@@ -1,6 +1,6 @@
 var SignaturePad = require('./signaturepad');
 
-function drawSmooth(points, graphics, end) {
+function drawSmooth(status, points, graphics, end) {
   var pad = new SignaturePad(graphics);
   var i = 0;
 
@@ -16,12 +16,16 @@ function drawSmooth(points, graphics, end) {
   }
 
   function nextPoint() {
-    pad.addPoint(points[i]);
-    if (i < points.length - 1) {
-      i++;
+    if (status.isDrawing) {
       requestAnimationFrame(nextPoint);
     } else {
-      end();
+      pad.addPoint(points[i]);
+      if (i < points.length - 1) {
+        i++;
+        requestAnimationFrame(nextPoint);
+      } else {
+        end();
+      }
     }
   }
 }
