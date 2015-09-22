@@ -29,6 +29,7 @@ var smoothed = new PIXI.Graphics();
 
 var status = {isDrawing : false};
 var points = [];
+var finger;
 
 var currentX = 0;
 var currentY = 0;
@@ -105,37 +106,43 @@ function reset() {
 }
 
 function animate() {
-  stage.addChild(graphics);
   renderer.render(stage);
 
   requestAnimationFrame(animate);
 }
 
 function onDown(eventData) {
+  eventData.stopPropagation();
+
+  finger = eventData.data.originalEvent.changedTouches[0].identifier;
   stage
     .on('mouseup', onUp)
-    .on('touchend', onUp)
     .on('mouseupoutside', onUp)
-    .on('touchendoutside', onUp)
     .on('mousemove', onMove)
+    .on('touchend', onUp)
+    .on('touchendoutside', onUp)
     .on('touchmove', onMove);
 
   drawStart(eventData.data.global.x, eventData.data.global.y);
 }
 
 function onUp(eventData) {
-  stage
-    .off('mouseup', onUp)
-    .off('touchend', onUp)
-    .off('mouseupoutside', onUp)
-    .off('touchendoutside', onUp)
-    .off('mousemove', onMove)
-    .off('touchmove', onMove);
+  if (eventData.data.originalEvent.changedTouches[0].identifier === finger) {
+    stage
+      .off('mouseup', onUp)
+      .off('mouseupoutside', onUp)
+      .off('mousemove', onMove)
+      .off('touchend', onUp)
+      .off('touchendoutside', onUp)
+      .off('touchmove', onMove);
 
-  drawTo(eventData.data.global.x, eventData.data.global.y);
-  drawEnd();
+    drawTo(eventData.data.global.x, eventData.data.global.y);
+    drawEnd();
+  }
 }
 
 function onMove(eventData) {
-  drawTo(eventData.data.global.x, eventData.data.global.y);
+  if (eventData.data.originalEvent.changedTouches[0].identifier === finger) {
+    drawTo(eventData.data.global.x, eventData.data.global.y);
+  }
 }

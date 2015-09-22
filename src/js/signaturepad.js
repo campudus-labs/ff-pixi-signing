@@ -86,7 +86,6 @@ var SignaturePad = (function () {
   };
 
   SignaturePad.prototype._drawPoint = function (x, y, size) {
-    console.log('drawing point at', x, y, size);
     var ctx = this._ctx;
 
     ctx.moveTo(x, y);
