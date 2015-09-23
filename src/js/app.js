@@ -1,6 +1,9 @@
 var PIXI = require('pixi.js');
 var smoothLine = require('./spline-interpolation').drawSmooth;
 
+var tempColor = 0xffd900;
+var smoothColor = 0x00d9ff;
+
 var resolution = (function () {
   var w = window,
     d = document,
@@ -86,7 +89,7 @@ function drawEnd() {
   });
 
   graphics = new PIXI.Graphics();
-  graphics.lineStyle(4, 0xffd900, 1);
+  graphics.lineStyle(4, tempColor, 1);
 
   stage.addChild(graphics);
   stage.addChild(smoothed);
@@ -98,8 +101,8 @@ function reset() {
   graphics.clear();
   smoothed.clear();
 
-  graphics.lineStyle(4, 0xffd900, 1);
-  smoothed.lineStyle(4, 0x00d9ff, 1);
+  graphics.lineStyle(4, tempColor, 1);
+  smoothed.lineStyle(4, smoothColor, 1);
 
   stage.addChild(graphics);
   stage.addChild(smoothed);
