@@ -3,6 +3,7 @@ var browserify = require('browserify');
 var browserSync = require('browser-sync');
 var sass = require('gulp-sass');
 var del = require('del');
+var ghPages = require('gulp-gh-pages');
 var source = require('vinyl-source-stream');
 
 gulp.task('build:assets', copyAssets);
@@ -11,6 +12,8 @@ gulp.task('build:scss', compileSass);
 gulp.task('build', ['build:assets', 'build:js', 'build:scss']);
 
 gulp.task('dev', ['build'], watcher);
+
+gulp.task('deploy', ['build'], deploy);
 
 gulp.task('clean', cleaner);
 
@@ -52,6 +55,11 @@ function browserifyJs() {
     .pipe(source('app.js'))
     .pipe(gulp.dest(outDir + '/js'))
     .pipe(browserSync.stream());
+}
+
+function deploy() {
+  return gulp.src(outDir + '/**')
+    .pipe(ghPages());
 }
 
 function cleaner(cb) {
