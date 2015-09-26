@@ -2,6 +2,7 @@ var PIXI = require('pixi.js');
 var smoothLine = require('./spline-interpolation').drawSmooth;
 
 function Signer(options) {
+  var self = this;
   var opts = options || {};
 
   var tempColor = opts.draftColor || opts.color || 0xffd900;
@@ -28,13 +29,14 @@ function Signer(options) {
   canvas.width = maxWidth;
   canvas.height = maxHeight;
 
-  var renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas});
+  self.renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas});
+  self.renderer.backgroundColor = 0xFFFFFF;
 
-// create the root of the scene graph
-  var stage = new PIXI.Container();
+  // create the root of the scene graph
+  self.stage = new PIXI.Container();
 
-  var graphics = new PIXI.Graphics();
-  var smoothed = new PIXI.Graphics();
+  self.graphics = new PIXI.Graphics();
+  self.smoothed = new PIXI.Graphics();
 
   var status = {isDrawing : false};
   var points = [];
@@ -51,35 +53,90 @@ function Signer(options) {
     reset();
   });
 
-  stage.interactive = true;
-  stage.hitArea = new PIXI.Rectangle(0, 0, maxWidth, maxHeight);
-  stage
-    .on('mousedown', onDown)
-    .on('touchstart', onDown);
+  self.onMouseDown = function (eventData) {
+    eventData.stopPropagation();
+
+    self.stage
+      .on('mouseup', self.onMouseUp)
+      .on('mouseupoutside', self.onMouseUp)
+      .on('mousemove', self.onMouseMove);
+
+    drawStart(eventData.data.global.x, eventData.data.global.y);
+  };
+
+  self.onDown = function (eventData) {
+    eventData.stopPropagation();
+
+    finger = eventData.data.originalEvent.changedTouches[0].identifier;
+    self.stage
+      .on('touchend', self.onUp)
+      .on('touchendoutside', self.onUp)
+      .on('touchmove', self.onMove);
+
+    drawStart(eventData.data.global.x, eventData.data.global.y);
+  };
+
+  self.onMouseUp = function (eventData) {
+    self.stage
+      .off('mouseup', self.onMouseUp)
+      .off('mouseupoutside', self.onMouseUp)
+      .off('mousemove', self.onMouseMove);
+
+    drawTo(eventData.data.global.x, eventData.data.global.y);
+    drawEnd();
+  };
+
+  self.onUp = function (eventData) {
+    if (eventData.data.originalEvent.changedTouches[0].identifier === finger) {
+      self.stage
+        .off('touchend', self.onUp)
+        .off('touchendoutside', self.onUp)
+        .off('touchmove', self.onMove);
+
+      drawTo(eventData.data.global.x, eventData.data.global.y);
+      drawEnd();
+    }
+  };
+
+  self.onMouseMove = function (eventData) {
+    drawTo(eventData.data.global.x, eventData.data.global.y);
+  };
+
+  self.onMove = function (eventData) {
+    if (eventData.data.originalEvent.changedTouches[0].identifier === finger) {
+      drawTo(eventData.data.global.x, eventData.data.global.y);
+    }
+  };
+
+  self.stage.interactive = true;
+  self.stage.hitArea = new PIXI.Rectangle(0, 0, maxWidth, maxHeight);
+  self.stage
+    .on('mousedown', self.onMouseDown)
+    .on('touchstart', self.onDown);
 
   reset();
 
-// run the render loop
+  // run the render loop
   animate();
 
   function drawStart(x, y) {
     status.isDrawing = true;
     points.push([x, y, new Date().getTime()]);
 
-    graphics.moveTo(x, y);
-    graphics.lineTo(x, y);
+    self.graphics.moveTo(x, y);
+    self.graphics.lineTo(x, y);
 
     currentX = x;
     currentY = y;
 
-    stage.addChild(graphics);
+    self.stage.addChild(self.graphics);
   }
 
   function drawTo(x, y) {
     points.push([x, y, new Date().getTime()]);
 
-    graphics.moveTo(currentX, currentY);
-    graphics.lineTo(x, y);
+    self.graphics.moveTo(currentX, currentY);
+    self.graphics.lineTo(x, y);
 
     currentX = x;
     currentY = y;
@@ -87,75 +144,54 @@ function Signer(options) {
 
   function drawEnd() {
     status.isDrawing = false;
-    var graphicsToClear = graphics;
+    var graphicsToClear = self.graphics;
 
-    smoothLine(status, points, smoothed, function () {
+    smoothLine(status, points, self.smoothed, function () {
       graphicsToClear.clear();
       graphicsToClear = null;
     });
 
-    graphics = new PIXI.Graphics();
-    graphics.lineStyle(4, tempColor, 1);
+    self.graphics = new PIXI.Graphics();
+    self.graphics.lineStyle(4, tempColor, 1);
 
-    stage.addChild(graphics);
-    stage.addChild(smoothed);
+    self.stage.addChild(self.graphics);
+    self.stage.addChild(self.smoothed);
 
     points = [];
   }
 
   function reset() {
-    graphics.clear();
-    smoothed.clear();
+    self.graphics.clear();
+    self.smoothed.clear();
 
-    graphics.lineStyle(4, tempColor, 1);
-    smoothed.lineStyle(4, smoothColor, 1);
+    self.graphics.lineStyle(4, tempColor, 1);
+    self.smoothed.lineStyle(4, smoothColor, 1);
 
-    stage.addChild(graphics);
-    stage.addChild(smoothed);
+    self.stage.addChild(self.graphics);
+    self.stage.addChild(self.smoothed);
   }
 
   function animate() {
-    renderer.render(stage);
+    self.renderer.render(self.stage);
 
     requestAnimationFrame(animate);
   }
 
-  function onDown(eventData) {
-    eventData.stopPropagation();
-
-    finger = eventData.data.originalEvent.changedTouches[0].identifier;
-    stage
-      .on('mouseup', onUp)
-      .on('mouseupoutside', onUp)
-      .on('mousemove', onMove)
-      .on('touchend', onUp)
-      .on('touchendoutside', onUp)
-      .on('touchmove', onMove);
-
-    drawStart(eventData.data.global.x, eventData.data.global.y);
-  }
-
-  function onUp(eventData) {
-    if (eventData.data.originalEvent.changedTouches[0].identifier === finger) {
-      stage
-        .off('mouseup', onUp)
-        .off('mouseupoutside', onUp)
-        .off('mousemove', onMove)
-        .off('touchend', onUp)
-        .off('touchendoutside', onUp)
-        .off('touchmove', onMove);
-
-      drawTo(eventData.data.global.x, eventData.data.global.y);
-      drawEnd();
-    }
-  }
-
-  function onMove(eventData) {
-    if (eventData.data.originalEvent.changedTouches[0].identifier === finger) {
-      drawTo(eventData.data.global.x, eventData.data.global.y);
-    }
-  }
-
 }
+
+Signer.prototype.destroy = function () {
+  this.stage
+    .off('mousedown', this.onMouseDown)
+    .off('mouseup', this.onMouseUp)
+    .off('mouseupoutside', this.onMouseUp)
+    .off('mousemove', this.onMouseMove)
+    .off('touchstart', this.onDown)
+    .off('touchend', this.onUp)
+    .off('touchendoutside', this.onUp)
+    .off('touchmove', this.onMove);
+  this.stage.destroy();
+  this.graphics.destroy();
+  this.smoothed.destroy();
+};
 
 module.exports = Signer;

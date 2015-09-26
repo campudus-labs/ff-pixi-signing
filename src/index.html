@@ -6,6 +6,17 @@
   <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+<div id="options">
+  <div>
+    <label for="tempcolor">Temporary color:</label>
+    <input id="tempcolor" name="tempcolor" value="0x3333ff"/>
+  </div>
+  <div>
+    <label for="signaturecolor">Signature color:</label>
+    <input id="signaturecolor" name="signaturecolor" value="0x000000"/>
+  </div>
+  <button id="optionSetter" type="button">Set options</button>
+</div>
 <div id="signature">
   <canvas id="signer"></canvas>
   <div class="reset">Löschen</div>
