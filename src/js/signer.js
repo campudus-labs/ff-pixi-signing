@@ -29,6 +29,7 @@ function Signer(options) {
   canvas.width = maxWidth;
   canvas.height = maxHeight;
 
+  self.active = true;
   self.renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas});
   self.renderer.backgroundColor = 0xFFFFFF;
 
@@ -99,6 +100,7 @@ function Signer(options) {
   };
 
   self.onMouseMove = function (eventData) {
+    console.log('blubb?');
     drawTo(eventData.data.global.x, eventData.data.global.y);
   };
 
@@ -172,26 +174,20 @@ function Signer(options) {
   }
 
   function animate() {
-    self.renderer.render(self.stage);
+    if (self.active) {
+      self.renderer.render(self.stage);
 
-    requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
+    }
   }
 
 }
 
 Signer.prototype.destroy = function () {
-  this.stage
-    .off('mousedown', this.onMouseDown)
-    .off('mouseup', this.onMouseUp)
-    .off('mouseupoutside', this.onMouseUp)
-    .off('mousemove', this.onMouseMove)
-    .off('touchstart', this.onDown)
-    .off('touchend', this.onUp)
-    .off('touchendoutside', this.onUp)
-    .off('touchmove', this.onMove);
-  this.stage.destroy();
-  this.graphics.destroy();
-  this.smoothed.destroy();
+  console.log('destroying');
+  this.active = false;
+  this.renderer.destroy();
+  console.log('destroyed all');
 };
 
 module.exports = Signer;
