@@ -100,7 +100,6 @@ function Signer(options) {
   };
 
   self.onMouseMove = function (eventData) {
-    console.log('blubb?');
     drawTo(eventData.data.global.x, eventData.data.global.y);
   };
 
@@ -184,10 +183,8 @@ function Signer(options) {
 }
 
 Signer.prototype.destroy = function () {
-  console.log('destroying');
   this.active = false;
   this.renderer.destroy();
-  console.log('destroyed all');
 };
 
 module.exports = Signer;
