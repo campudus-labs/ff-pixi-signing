@@ -22,8 +22,8 @@ function Signer(options) {
     return [x, y];
   }());
 
-  var maxWidth = resolution[0];
-  var maxHeight = resolution[1];
+  var maxWidth = resolution[0] * 2;
+  var maxHeight = resolution[1] * 2;
 
   var canvas = document.querySelector(canvasSelector);
   canvas.width = maxWidth;
