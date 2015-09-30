@@ -15,8 +15,8 @@ function createSigner() {
 
   var options = {
     signerId : 'signature',
-    draftColor : document.getElementById('tempcolor').value,
-    color : document.getElementById('signaturecolor').value
+    draftColor : '0x' + document.getElementById('tempcolor').value,
+    color : '0x' + document.getElementById('signaturecolor').value
   };
 
   signing = new Signer(options);
