@@ -125,7 +125,7 @@ function Signer(options) {
     points.push([x, y, new Date().getTime()]);
 
     self.graphics.moveTo(x, y);
-    self.graphics.lineTo(x, y);
+    self.graphics.drawCircle(x, y, 2.5);
 
     currentX = x;
     currentY = y;
@@ -137,7 +137,7 @@ function Signer(options) {
     points.push([x, y, new Date().getTime()]);
 
     self.graphics.moveTo(currentX, currentY);
-    self.graphics.lineTo(x, y);
+    self.graphics.drawCircle(x, y, 2.5);
 
     currentX = x;
     currentY = y;
