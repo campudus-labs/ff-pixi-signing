@@ -145,12 +145,6 @@ function Signer(options) {
 
   function drawEnd() {
     status.isDrawing = false;
-    var graphicsToClear = self.graphics;
-
-    smoothLine(status, points, self.smoothed, function () {
-      graphicsToClear.clear();
-      graphicsToClear = null;
-    });
 
     self.graphics = new PIXI.Graphics();
     self.graphics.lineStyle(4, tempColor, 1);
