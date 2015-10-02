@@ -30,7 +30,7 @@ function Signer(options) {
   canvas.height = maxHeight;
 
   self.active = true;
-  self.renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas});
+  self.renderer = PIXI.autoDetectRenderer(maxWidth, maxHeight, {view : canvas, antialias : true});
   self.renderer.backgroundColor = 0xFFFFFF;
 
   // create the root of the scene graph
