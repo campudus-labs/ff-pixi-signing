@@ -26829,7 +26829,6 @@ function Signer(options) {
     self.graphics.lineStyle(4, tempColor, 1);
 
     self.stage.addChild(self.graphics);
-    self.stage.addChild(self.smoothed);
 
     points = [];
   }
